@@ -190,7 +190,7 @@ while True:
 
 The script starts by importing the necessary libraries and defining several variables. The "current_directory" variable is used to identify the directory where the script is running. The "cwd_as_obj" variable converts the current directory into a path object, which makes it easier to navigate the directory structure. The "items" variable is a list of paths inside the current working directory.
 
-The script then loops through each item in the "items" list and checks if it's a directory. If it is a directory, the script creates a notes file for it and looks for the newest audio file in the directory. If it finds an audio file, it adds it to the rotation. If it doesn't find an audio file, it logs an error message.
+The script then loops through each item in the "items" list and checks if it's a directory. If it is a directory, the script creates a notes file for it and looks for the newest audio file in the directory. If it finds an audio file, it adds it to the rotation which is held in a python dictionary. If it doesn't find an audio file, it logs an error message.
 
 Here's the code...
 ```py
@@ -198,8 +198,6 @@ current_directory = os.path.dirname(os.path.abspath(__file__))  # => this is a s
 cwd_as_obj = pathlib.Path(current_directory)  # => turn that string into a path obj
 items = list(cwd_as_obj.iterdir())  # => list the paths inside our cwd
 ```
-
-Then with some looping we add it to a Python dictionary for use within the script, create a notes file if one is not found, and handle other cases and possibilities along the way:
 
 ```
 for item in items:
