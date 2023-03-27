@@ -193,13 +193,14 @@ The script starts by importing the necessary libraries and defining several vari
 The script then loops through each item in the "items" list and checks if it's a directory. If it is a directory, the script creates a notes file for it and looks for the newest audio file in the directory. If it finds an audio file, it adds it to the rotation which is held in a python dictionary. If it doesn't find an audio file, it logs an error message.
 
 Here's the code...
+
 ```py
 current_directory = os.path.dirname(os.path.abspath(__file__))  # => this is a string for the directory the script is in
 cwd_as_obj = pathlib.Path(current_directory)  # => turn that string into a path obj
 items = list(cwd_as_obj.iterdir())  # => list the paths inside our cwd
 ```
 
-```
+```py
 for item in items:
     if item.is_dir():
         folder_count = folder_count + 1
@@ -374,6 +375,6 @@ while True:
                 f.close()
             comment_time = False
 ```
-
+This could be optimized and written a little more clearly of course, but for now it's working great for what I need it for :)
 
 Overall, this automation script can help music producers keep track of their audio files and sessions more efficiently. By automating the process of monitoring audio files and generating session notes, producers can focus more on creating music and less on administrative tasks. The script could also be adapted and extended to meet other use cases, such as organizing files or generating reports.
