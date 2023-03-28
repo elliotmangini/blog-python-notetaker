@@ -1,8 +1,8 @@
-<h1>Automation Script to Monitor Audio Bounces and Generate Session Notes</h2>
+<h1>Automation Script to Monitor Audio Bounces and Generate Session Notes</h1>
 
-Music producers and other creatives often work with a large number of files and projects and it can be challenging to keep track of all of them. This automation script builds on the functionality of my last automation blog post and script to help musicians keep track of their audio files by looking only at the relevant ones (most recent) and then by dynamically interacting with session notes automatically. The script uses Python and the Pygame library to play audio files and catalogue notes on the audio files in real time with timestamps that show when and where the note was made.
+Music producers and other creatives often work with a large number of files and projects and it can be challenging to keep track of all of them. This automation script builds on the functionality of my last two automation mini-projects to help musicians keep track of and take notes on their audio files by looking only at the relevant ones (most recent) and then by dynamically interacting with session notes automatically. The script uses Python and the Pygame library to play audio files and catalogue notes on the audio files in real time with timestamps that show when and where the note was made.
 
-This script ultimately answers the question "How to randomly play audio files and take notes on them using Python".
+This script ultimately answers the question "How to randomly play audio files and take notes on them using Python?".
 
 You can find the script and try it out on my [Github](https://github.com/elliotmangini/blog-python-notetaker) and take a glance at it here before we dive into how it works.
 
@@ -188,17 +188,18 @@ while True:
 
 ```
 
-The script starts by importing the necessary libraries and defining several variables. The "current_directory" variable is used to identify the directory where the script is running. The "cwd_as_obj" variable converts the current directory into a path object, which makes it easier to navigate the directory structure. The "items" variable is a list of paths inside the current working directory.
+<h1>Script Breakdown</h1>
 
-The script then loops through each item in the "items" list and checks if it's a directory. If it is a directory, the script creates a notes file for it and looks for the newest audio file in the directory. If it finds an audio file, it adds it to the rotation which is held in a python dictionary. If it doesn't find an audio file, it logs an error message.
-
-Here's the code...
 
 ```py
 current_directory = os.path.dirname(os.path.abspath(__file__))  # => this is a string for the directory the script is in
 cwd_as_obj = pathlib.Path(current_directory)  # => turn that string into a path obj
 items = list(cwd_as_obj.iterdir())  # => list the paths inside our cwd
 ```
+
+The script starts by importing the necessary libraries and defining several variables. The `current_directory` variable is used to identify the directory where the script is running. The `cwd_as_obj` variable converts the current directory into a path object, which makes it easier to navigate the directory structure. The `items` variable is a list of paths inside the current working directory.
+
+The script then loops through each item in the `items` list and checks if it's a directory. If it is a directory, the script creates a notes file for it if one does not already exists and looks for the newest audio file by comparing and updating the `most_recent_bounce` (file) with the bounce the loop is "looking at" currently within the directory. If it finds an audio file, it adds it to the "rotation" which is held in a python dictionary called `discography`. If it doesn't find an audio file, it logs an error message. This part works the same as my last mini-project with the added step of keeping track of these targets using our dictionary.
 
 ```py
 for item in items:
@@ -241,7 +242,7 @@ for item in items:
             \U0001F6A8\U0001F6A8\U0001F6A8 \n \U0001F6A8\U0001F6A8\U0001F6A8")
 ```
 
-Using a few variables we print relevant information along the way and color code it in the terminal:
+Using a few variables we also set things up to print relevant information to the console, our simple UI, and color code it as well:
 
 ```py
 folder_count = 0
@@ -262,7 +263,9 @@ print(f"{salmon}{bounce_count}{default} Audio Bounces found within subfolders.")
 print(f"{green}{found_count}{default} Newest Bounces placed into rotation.\n")
 ```
 
-The script then randomly selects an audio file from the "rotation" held in memory and plays it back using Pygame. While the audio file is playing, the user can mark the session's start and end time and add comments using the script.
+The script randomly selects an audio file from the `discography` held in memory and plays it back using `Pygame`.
+
+Here we are grabbing a random audio file and that file's corresponding notes and then making a first note in that notes file with information on the instance of listening that has just begun.
 
 ```py
 random_notes_file = random.choice(list(discography.keys()))
@@ -282,9 +285,7 @@ commented = False
 audio_length = pygame.mixer.Sound(random_audio_file).get_length()
 ```
 
-Here we are grabbing a random audio file and that file's corresponding notes and then making a first note in that notes file with information on the instance of listening that has just begun.
-
-Below is our play function which prints to the console to make it obvious what is going on and attempts to loop the audio each time it finishes (though I don't think I was able to get that working!). Along with a helper function that gets a timestamp from the audio playing and formats it for use in the notes.
+Below is our play function which prints to the console and attempts to loop the audio each time it finishes (though I don't think I was able to get that working!). Along with a helper function that gets a timestamp from the audio playing and formats it for use in the notes.
 
 ```py
 def play_audio():
@@ -316,7 +317,9 @@ def get_time():
     return timestamp
 ```
 
-There is also the comment_time value which I'm toggling between false and a string representing the time this was in the following function the user can input a comment and at the time of input we log the time in the audio, or if the user hits enter with no input (no comment) it will grab the current time in the audio and then use that when the next input is submitted containing the comment. This way if you have a comment that takes 30 seconds to type out you can still control the timestamp in the music that the comment corresponds to. Additionally if you forget to grab the time explicitly you still get to publish the comment and the script does its "best" to mark that comment with a relavent time.
+There is also the `comment_time` variable which I'm toggling between false and a string representing the time. This way in the following function the user can input a comment-- and at the time of input we log the time in the audio that is currently playing, or if the user hits enter with no input (no comment) it will grab the current time in the audio and then use that when the next input is submitted containing the comment. This way if you have a comment that takes 30 seconds to type out you can still control the timestamp in the music that the comment corresponds to. Additionally if you forget to grab the time explicitly you still get to publish the comment and the script does its "best" to mark that comment with a relavent time.
+
+There are also a couple of inputs set up `r` for restarting the audio playing and `s` for skipping to the next audio file.
 
 So lastly here is the part of the script responsible for getting those user inputs and handling them appropriately:
 
@@ -375,6 +378,28 @@ while True:
                 f.close()
             comment_time = False
 ```
-This could be optimized and written a little more clearly of course, but for now it's working great for what I need it for :)
+This could be optimized and written a little more clearly, but it works great for me in this not-so-glamorous form :)
 
-Overall, this automation script can help music producers keep track of their audio files and sessions more efficiently. By automating the process of monitoring audio files and generating session notes, producers can focus more on creating music and less on administrative tasks. The script could also be adapted and extended to meet other use cases, such as organizing files or generating reports.
+Overall, this automation script can help music producers generate session notes for songs more efficiently and objectively. By automating the process of monitoring audio files and generating session notes, producers can focus more on creating music and less on administrative tasks. The script could also be adapted and extended to meet other use cases, such as organizing files or generating reports.
+
+<h1>Script in Action</h1>
+
+Here are a few screenshots of how it looks!
+
+![Image of Initialization, skip, and note-taking.](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/gx5oftboiwbawll27jks.png)
+<figcaption>Initialization, skip, and note-taking.</figcaption>
+&nbsp;
+
+![Image showing Two-step commenting to grab timestamp, and single-step commenting with "automatic" timestamp.](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/eyp2tqre1k76i0eritpp.png)
+<figcaption>Two-step commenting to grab timestamp, and single-step commenting with "automatic" timestamp.</figcaption>
+&nbsp;
+
+![Screenshot of Notes file generated using this script.](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/muv7wpvdmqm1lfvtu98n.png)
+<figcaption>Notes file generated using this script.</figcaption>
+&nbsp;
+
+Thanks for checking out my first fully-featured little program/script.
+
+Looking forward to learning more Python and solving more real-world problems.
+-Elliot/Big Sis
+
